@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="bn">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StreamWave IPTV - Premium Live Player</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+      /* প্রিমিয়াম গ্লোবাল স্টাইল এবং ভ্যারিয়েবল */
+      :root {
+        --bg-main: #090d16;
+        --bg-card: #131926;
+        --bg-card-hover: #1e2638;
+        --primary: #3b82f6;
+        --primary-glow: rgba(59, 130, 246, 0.3);
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --success: #10b981;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--bg-main);
+        color: var(--text-main);
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      /* প্রিমিয়াম হেডার */
+      header {
+        background: linear-gradient(to bottom, #101726, #090d16);
+        padding: 15px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #1e293b;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        z-index: 100;
+      }
+
+      header h1 {
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: linear-gradient(45deg, #3b82f6, #60a5fa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      /* মেইন লেআউট (ডেস্কটপ এবং মোবাইল রেসপনসিভ) */
+      .app-container {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+        flex-direction: column; /* মোবাইলের জন্য আগে কলাম */
+      }
+
+      /* ডেস্কটপ ভিউ পোর্টের জন্য গ্রিড/ফ্লেক্স পরিবর্তন */
+      @media (min-width: 992px) {
+        .app-container {
+          flex-direction: row;
+        }
+      }
+
+      /* ভিডিও প্লেয়ার সেকশন */
+      .player-section {
+        flex: 1.7;
+        background: #000;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        aspect-ratio: 16 / 9; /* মোবাইলের সঠিক রেশিও */
+      }
+
+      @media (max-width: 991px) {
+        .player-section {
+          position: sticky;
+          top: 0;
+          z-index: 90; /* মোবাইলে স্ক্রোল করলে যেন উপরে আটকে থাকে */
+          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+        }
+      }
+
+      @media (min-width: 992px) {
+        .player-section {
+          height: 100%;
+          aspect-ratio: auto;
+        }
+      }
+
+      video {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        background: #000;
+      }
+
+      .error-overlay {
+        position: absolute;
+        background: rgba(9, 13, 22, 0.9);
+        inset: 0;
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+        color: #ef4444;
+        font-weight: 500;
+      }
+
+      /* সাইডবার বা প্লেলিস্ট প্যানেল */
+      .sidebar-section {
+        flex: 1;
+        background: #0c1220;
+        display: flex;
+        flex-direction: column;
+        border-left: 1px solid #1e293b;
+        overflow: hidden;
+      }
+
+      /* সার্চ ও স্ট্যাটাস এরিয়া */
+      .controls-wrapper {
+        padding: 16px;
+        background: #090d16;
+        border-bottom: 1px solid #1e293b;
+      }
+
+      .search-box {
+        position: relative;
+        width: 100%;
+      }
+
+      .search-box input {
+        width: 100%;
+        padding: 12px 16px;
+        background: var(--bg-card);
+        border: 1px solid #1e293b;
+        border-radius: 12px;
+        color: var(--text-main);
+        font-size: 15px;
+        outline: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .search-box input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--primary-glow);
+        background: var(--bg-card-hover);
+      }
+
+      /* আধুনিক স্ট্যাটাস বার */
+      #status-bar {
+        margin-top: 12px;
+        background: rgba(30, 41, 59, 0.5);
+        padding: 10px 14px;
+        border-radius: 8px;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--text-muted);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      /* টিভি চ্যানেল লিস্ট স্ক্রোল এরিয়া */
+      .channel-list-container {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px 16px;
+      }
+
+      /* কাস্টম প্রিমিয়াম স্ক্রোলবার */
+      .channel-list-container::-webkit-scrollbar {
+        width: 6px;
+      }
+      .channel-list-container::-webkit-scrollbar-thumb {
+        background: #1e293b;
+        border-radius: 10px;
+      }
+
+      /* আল্ট্রা-প্রিমিয়াম চ্যানেল কার্ড */
+      .channel-card {
+        display: flex;
+        align-items: center;
+        background: var(--bg-card);
+        margin-bottom: 12px;
+        padding: 12px;
+        border-radius: 14px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        border: 1px solid rgba(255, 255, 255, 0.02);
+        animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(15px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .channel-card:hover {
+        background: var(--bg-card-hover);
+        transform: translateY(-2px);
+        border-color: #2a364f;
+      }
+
+      .channel-card.active {
+        background: rgba(59, 130, 246, 0.15);
+        border-color: var(--primary);
+        box-shadow: inset 0 0 12px rgba(59, 130, 246, 0.2);
+      }
+
+      .logo-wrapper {
+        width: 54px;
+        height: 54px;
+        min-width: 54px;
+        background: #ffffff;
+        border-radius: 10px;
+        padding: 4px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-right: 16px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+      }
+
+      .channel-logo {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+
+      .channel-info {
+        flex: 1;
+      }
+
+      .channel-info h3 {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-main);
+        margin-bottom: 4px;
+        line-height: 1.3;
+      }
+
+      /* লাইভ ইন্ডিকেটর */
+      .live-tag {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .channel-card.active .live-tag {
+        color: var(--success);
+      }
+
+      .channel-card.active .live-tag::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        background-color: var(--success);
+        border-radius: 50%;
+        display: inline-block;
+        box-shadow: 0 0 8px var(--success);
+      }
+
+      /* লোডিং স্পিনার */
+      .spinner {
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-top: 2px solid var(--primary);
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>লাইভ টিভি দেখুন</h1>
+    </header>
+
+    <div class="app-container">
+      <div class="player-section">
+        <video id="video-player" controls playsinline></video>
+        <div class="error-overlay" id="error-layer">
+          <p>⚠️ এই চ্যানেলটি লোড করা যাচ্ছে না বা সাময়িকভাবে অফলাইন আছে।</p>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="controls-wrapper">
+          <div class="search-box">
+            <input
+              type="text"
+              id="search-input"
+              placeholder="চ্যানেলের নাম দিয়ে সার্চ করুন..."
+            />
+          </div>
+
+          <div id="status-bar">
+            <div class="spinner" id="status-spinner"></div>
+            <span id="status-text">প্লেলিস্ট নিয়ে আসা হচ্ছে...</span>
+          </div>
+        </div>
+
+        <div class="channel-list-container" id="channel-list"></div>
+      </div>
+    </div>
+
+    <script>
+      const playlistUrl =
+        "https://raw.githubusercontent.com/imShakil/tvlink/refs/heads/main/iptv.m3u8";
+      const video = document.getElementById("video-player");
+      const errorLayer = document.getElementById("error-layer");
+      const statusText = document.getElementById("status-text");
+      const statusSpinner = document.getElementById("status-spinner");
+      const listContainer = document.getElementById("channel-list");
+      const searchInput = document.getElementById("search-input");
+
+      let hls;
+      let isFirstChannelPlayed = false;
+      let channelCounter = 0;
+      let searchQuery = "";
+
+      // ইনস্ট্যান্ট সার্চ ফিল্টার
+      searchInput.addEventListener("input", (e) => {
+        searchQuery = e.target.value.toLowerCase().trim();
+        filterChannels();
+      });
+
+      // ১. প্লেলিস্ট ডাটা নিয়ে আসা
+      async function fetchPlaylist() {
+        try {
+          const response = await fetch(playlistUrl);
+          if (!response.ok) throw new Error();
+          const data = await response.text();
+          parseM3u(data);
+        } catch (error) {
+          statusSpinner.style.display = "none";
+          statusText.innerHTML = "❌ প্লেলিস্ট লোড করতে ব্যর্থ।";
+        }
+      }
+
+      // ২. m3u8 ফাইল পার্সিং
+      function parseM3u(content) {
+        const lines = content.split("\n");
+        const allChannels = [];
+        let currentName = "Unknown Channel";
+        let currentLogo = "";
+
+        lines.forEach((line) => {
+          line = line.trim();
+          if (line.startsWith("#EXTINF:")) {
+            const logoMatch = line.match(/tvg-logo="(.*?)"/);
+            currentLogo = logoMatch ? logoMatch[1] : "";
+            const nameSplit = line.split(",");
+            if (nameSplit.length > 1) {
+              currentName = nameSplit[nameSplit.length - 1].trim();
+            }
+          } else if (line.length > 0 && !line.startsWith("#")) {
+            allChannels.push({
+              name: currentName,
+              logo: currentLogo,
+              url: line,
+            });
+            currentName = "Unknown Channel";
+            currentLogo = "";
+          }
+        });
+
+        checkAndRenderSequential(allChannels);
+      }
+
+      // ৩. ব্যাকগ্রাউন্ডে ফাস্ট লিংক চেকিং (Timeout ২.২ সেকেন্ড)
+      async function checkUrl(url) {
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 2200);
+          await fetch(url, { mode: "no-cors", signal: controller.signal });
+          clearTimeout(timeoutId);
+          return true;
+        } catch (error) {
+          return false;
+        }
+      }
+
+      // ৪. একটি একটি করে লাইভ ভেলিডেশন ও ইন্টারফেসে রেন্ডারিং
+      async function checkAndRenderSequential(channels) {
+        for (let i = 0; i < channels.length; i++) {
+          statusText.innerText = `স্ক্যান হচ্ছে: ${i + 1}/${channels.length} (সচল: ${channelCounter})`;
+
+          const isWorking = await checkUrl(channels[i].url);
+          if (isWorking) {
+            appendChannelToUI(channels[i]);
+          }
+        }
+        statusSpinner.style.display = "none";
+        statusText.innerText = `চেকিং শেষ! মোট সচল চ্যানেল: ${channelCounter}টি`;
+      }
+
+      // ৫. সচল চ্যানেল অ্যাপেন্ড করা
+      function appendChannelToUI(channel) {
+        const card = document.createElement("div");
+        card.className = "channel-card";
+        card.id = `channel-${channelCounter}`;
+
+        // সুন্দর ডিফল্ট টিভি আইকন (লোগো না থাকলে)
+        const fallbackSVG =
+          "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOTRhM2I4IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHJlY3QgeD0iMiIgeT0iNyIgd2lkdGg9IjIwIiBoZWlnaHQ9IjE1IiByeD0iMiIgcnk9IjIiPjwvcmVjdD48cG9seWxpbmUgcG9pbnRzPSIxNyAyIDEyIDcgNyAyIj48L3BvbHlsaW5lPjwvc3ZnPg==";
+
+        card.innerHTML = `
+                <div class="logo-wrapper">
+                    <img src="${channel.logo || fallbackSVG}" class="channel-logo" onerror="this.src='${fallbackSVG}'" alt="TV">
+                </div>
+                <div class="channel-info">
+                    <h3>${channel.name}</h3>
+                    <div class="live-tag">Live Stream</div>
+                </div>
+            `;
+
+        card.onclick = () => {
+          document
+            .querySelectorAll(".channel-card")
+            .forEach((c) => c.classList.remove("active"));
+          card.classList.add("active");
+          playChannel(channel.url);
+
+          // মোবাইল ব্যবহারকারীদের সুবিধার্থে ক্লিক করলে স্ক্রিন সোজা উপরে ভিডিও প্লেয়ারে নিয়ে যাবে
+          if (window.innerWidth < 992) {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }
+        };
+
+        // সার্চ ফিল্টারিং অ্যাক্টিভ থাকলে চেকিং এর সাথে সাথে সিঙ্ক হবে
+        if (
+          searchQuery !== "" &&
+          !channel.name.toLowerCase().includes(searchQuery)
+        ) {
+          card.style.display = "none";
+        }
+
+        listContainer.appendChild(card);
+
+        // ১ম সচল চ্যানেলটি অটো-প্লে করা
+        if (!isFirstChannelPlayed) {
+          card.classList.add("active");
+          playChannel(channel.url);
+          isFirstChannelPlayed = true;
+        }
+
+        channelCounter++;
+      }
+
+      // ৬. সার্চ ফিল্টার লজিক
+      function filterChannels() {
+        const cards = document.querySelectorAll(".channel-card");
+        cards.forEach((card) => {
+          const name = card
+            .querySelector(".channel-info h3")
+            .innerText.toLowerCase();
+          if (name.includes(searchQuery)) {
+            card.style.display = "flex";
+          } else {
+            card.style.display = "none";
+          }
+        });
+      }
+
+      // ৭. ভিডিও প্লেয়ার ইন্টিগ্রেশন (HLS ও Native Safari সাপোর্টসহ)
+      function playChannel(url) {
+        errorLayer.style.display = "none";
+
+        if (Hls.isSupported()) {
+          if (hls) hls.destroy();
+          hls = new Hls({
+            maxBufferLength: 10,
+            enableWorker: true,
+          });
+          hls.loadSource(url);
+          hls.attachMedia(video);
+
+          hls.on(Hls.Events.MANIFEST_PARSED, function () {
+            video.play().catch(() => console.log("Auto-play blocked"));
+          });
+
+          hls.on(Hls.Events.ERROR, function (event, data) {
+            if (data.fatal) errorLayer.style.display = "flex";
+          });
+        } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+          // Apple Safari বা iOS ব্রাউজারের জন্য সরাসরি প্লে
+          video.src = url;
+          video.addEventListener("loadedmetadata", function () {
+            video.play().catch(() => console.log("Auto-play blocked"));
+          });
+          video.addEventListener("error", function () {
+            errorLayer.style.display = "flex";
+          });
+        }
+      }
+
+      // অ্যাপ চালু করা
+      fetchPlaylist();
+    </script>
+  </body>
+</html>
