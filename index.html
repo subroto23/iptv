@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>রূপসী বাংলা ক্লাব || একটি সামাজিক উন্নায়নমূলক ক্লাব</title>
-    <meta name="description" content="ফরিদপুর জেলার বোয়ালমারী উপজেলার কাদিরদী দাসপাড়া গ্রাম সম্পর্কিত তথ্য সমৃদ্ধ সাইট">
+    <title>রূপসী বাংলা ক্লাব || একটি সামাজিক উন্নয়নমূলক ক্লাব</title>
+    <meta name="description" content="ফریدপুর জেলার বোয়ালমারী উপজেলার কাদিরদী দাসপাড়া গ্রাম সম্পর্কিত তথ্য সমৃদ্ধ সাইট">
     <link rel="icon" href="https://i.ibb.co/Chvqw18/RBC-Logo.jpg" sizes="any">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.8/dist/hls.min.js"></script>
     <style>
@@ -37,32 +37,13 @@
         overflow: hidden;
       }
 
-      header {
-        background: linear-gradient(135deg, #111827, #0b0f19);
-        padding: 16px 20px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border-bottom: 1px solid #1e293b;
-        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4);
-        z-index: 100;
-        flex-shrink: 0;
-      }
-
-      header h1 {
-        font-size: 20px;
-        font-weight: 700;
-        background: linear-gradient(45deg, #3b82f6, #10b981);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-      }
-
       /* মেইন কন্টেইনার ফিক্স */
       .app-container {
         display: flex;
         flex: 1;
         overflow: hidden;
         flex-direction: column;
+        height: 100%;
       }
 
       @media (min-width: 1024px) {
@@ -113,14 +94,15 @@
         z-index: 10;
       }
 
-      /* চ্যানেল এরিয়া ও স্ক্রোল ফিক্স */
+      /* চ্যানেল এরিয়া ও স্ক্রোল ফিক্স */
       .content-section {
         flex: 1;
         display: flex;
         flex-direction: column;
         background: #0e1424;
-        overflow: hidden; /* ভেতরের স্ক্রোল সচল রাখার জন্য */
+        overflow: hidden; 
         border-left: 1px solid #1e293b;
+        height: 100%;
       }
 
       .controls-wrapper {
@@ -162,10 +144,10 @@
         border: 1px solid rgba(255, 255, 255, 0.03);
       }
 
-      /* আল্ট্রা-রেসপনসিভ গ্রিড (কার্ড কাটবে না) */
+      /* আল্ট্রা-রেসপনসিভ গ্রিড (স্ক্রোল ও কার্ড হাইট ফিক্সড) */
       .channel-grid-container {
         flex: 1;
-        overflow-y: auto; /* স্ক্রোল ফিক্স */
+        overflow-y: auto; 
         padding: 16px;
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
@@ -175,7 +157,7 @@
 
       @media (min-width: 480px) {
         .channel-grid-container {
-          grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+          grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
           gap: 16px;
         }
       }
@@ -188,21 +170,22 @@
         border-radius: 4px;
       }
 
-      /* ওটিটি প্রিমিয়াম ফ্ল্যাট কার্ড ডিজাইন */
+      /* ওটিটি প্রিমিয়াম ফ্ল্যাট কার্ড ডিজাইন */
       .channel-card {
         background: var(--bg-card);
         border-radius: 12px;
-        padding: 12px;
+        padding: 14px 10px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: flex-start;
+        justify-content: center;
         cursor: pointer;
         transition: all 0.25s ease;
         border: 1px solid rgba(255, 255, 255, 0.03);
         position: relative;
-        min-height: 140px; /* কার্ডের হাইট ফিক্স */
-        height: auto;
+        min-height: 145px; 
+        height: 145px; /* ফিক্সড হাইট যেন কেটে না যায় */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       }
 
       .channel-card:hover {
@@ -220,15 +203,15 @@
 
       /* থাম্বনেইল/লোগো সাইজ ফিক্স */
       .logo-wrapper {
-        width: 64px;
-        height: 64px;
+        width: 68px;
+        height: 68px;
         background: #ffffff;
-        border-radius: 10px;
+        border-radius: 12px;
         padding: 6px;
         display: flex;
         justify-content: center;
         align-items: center;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         flex-shrink: 0;
       }
@@ -236,10 +219,10 @@
       .channel-logo {
         width: 100%;
         height: 100%;
-        object-fit: contain; /* ইমেজ কেটে যাবে না, পুরো শো করবে */
+        object-fit: contain; 
       }
 
-      /* চ্যানেলের নাম কেটে যাওয়া বন্ধ করার ফিক্স */
+      /* চ্যানেলের নাম ক্লিপিং ফিক্স */
       .channel-name {
         font-size: 13px;
         font-weight: 600;
@@ -251,8 +234,8 @@
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
-        margin-top: auto; /* টেক্সটকে নিচে পুশ করবে সমানভাবে */
         width: 100%;
+        height: 34px; /* নির্দিষ্ট লাইনের স্পেসিং */
       }
 
       .live-badge {
@@ -290,15 +273,12 @@
     </style>
   </head>
   <body>
-    <!-- <header>
-      <h1>লাইভ টিভি দ</h1>
-    </header> -->
 
     <div class="app-container">
       <div class="player-section">
         <video id="video-player" controls playsinline></video>
         <div class="error-overlay" id="error-layer">
-          <p>চ্যানেলটি সাময়িকভাবে ডাউন আছে তাই প্লে করা যাচ্ছে না।</p>
+          <p>চ্যানেলটি সাময়িকভাবে ডাউন আছে তাই প্লে করা যাচ্ছে না।</p>
         </div>
       </div>
 
@@ -307,11 +287,11 @@
           <div class="search-box">
             <input type="text" id="search-input" placeholder="চ্যানেল খুঁজুন..." />
           </div>
-          <!-- <div id="status-bar">
+          <div id="status-bar">
             <div class="spinner" id="status-spinner"></div>
             <span id="status-text">প্লেলিস্ট প্রসেস করা হচ্ছে...</span>
           </div>
-        </div> -->
+        </div>
         <div class="channel-grid-container" id="channel-grid"></div>
       </div>
     </div>
@@ -329,8 +309,6 @@
       let activeCard = null;
       let validChannelCount = 0;
       let searchQuery = "";
-
-      // ব্যাকগ্রাউন্ডে লিংক ভ্যালিডেশন করার জন্য হিডেন প্লেয়ার ইঞ্জিন
       let checkerHls = null;
 
       searchInput.addEventListener("input", (e) => {
@@ -376,30 +354,27 @@
 
         if (rawChannels.length === 0) {
           statusSpinner.style.display = "none";
-          statusText.innerText = "কোনো চ্যানেল পাওয়া যায়নি।";
+          statusText.innerText = "কোনো চ্যানেল পাওয়া যায়নি।";
           return;
         }
 
-        // ক্রমান্বয়ে ব্যাকগ্রাউন্ডে লিংক চেক শুরু করা
         validateSequential(rawChannels);
       }
 
-      // প্রতিটি সোর্স রিয়েল-টাইমে চেক করার স্মার্ট ফাংশন
       async function validateSequential(channels) {
         statusText.innerText = `চ্যানেল যাচাই করা হচ্ছে... (সচল: ০)`;
         
         for (let i = 0; i < channels.length; i++) {
           const chan = channels[i];
-          statusText.innerText = `স্ক্যানিং: ${i + 1}/${channels.length} | সচল পাওয়া গেছে: ${validChannelCount}টি`;
+          statusText.innerText = `স্ক্যানিং: ${i + 1}/${channels.length} | সচল: ${validChannelCount}`;
           
-          // প্রথমে ট্রাই করবে HTTPS দিয়ে, কাজ না করলে অরিজিনাল HTTP দিয়ে ট্রাই করবে
           let isValid = await checkHlsLink(chan.url);
           if (!isValid && chan.url !== chan.originalUrl) {
             isValid = await checkHlsLink(chan.originalUrl);
-            if(isValid) chan.url = chan.originalUrl; // যদি অরিজিনাল কাজ করে তবে ইউআরএল আপডেট
+            if(isValid) chan.url = chan.originalUrl;
           }
 
-          // লিংক কাজ করলেই কেবল সাথে সাথে UI-তে আসবে, অন্যথায় স্কিপ (UI তে দেখাবেই না)
+          // সচল হলে সাথে সাথে UI-তে যুক্ত হবে, অন্যথায় অবজেক্টটি বাদ যাবে
           if (isValid) {
             appendChannelToUI(chan);
           }
@@ -409,37 +384,38 @@
         statusText.innerText = `যাচাইকরণ শেষ! মোট সচল চ্যানেল: ${validChannelCount}টি`;
       }
 
-      // HLS ম্যানিফেস্ট রিড করে লিংক সচল কি না তা নিখুঁতভাবে চেক করার প্রমিজ
       function checkHlsLink(url) {
         return new Promise((resolve) => {
-          // সাফারী বা আইওএস এর ক্ষেত্রে (যেখানে Hls সাপোর্ট নেই) সরাসরি ভ্যালিড ধরবে প্রথম ধাপে
           if (!Hls.isSupported()) {
-            resolve(true); 
+            // Hls.js নেটিভলি সাপোর্ট না করলে (যেমন iOS Safari) Network Fetch দিয়ে রেসপন্স হেডার চেক করবে
+            fetch(url, { method: 'HEAD', mode: 'no-cors' })
+              .then(() => resolve(true))
+              .catch(() => resolve(false));
             return;
           }
 
           if (checkerHls) checkerHls.destroy();
           
           checkerHls = new Hls({
-            manifestLoadingTimeOut: 1800, // ১.৮ সেকেন্ডের বেশি সময় নিলে ডেড ধরবে
-            manifestLoadingMaxRetry: 0
+            manifestLoadingTimeOut: 1500, // টাইমআউট ১.৫ সেকেন্ডে নামানো হয়েছে ফাস্ট চেকিংয়ের জন্য
+            manifestLoadingMaxRetry: 0,
+            fragLoadingMaxRetry: 0
           });
 
           checkerHls.loadSource(url);
           
           checkerHls.on(Hls.Events.MANIFEST_PARSED, () => {
             checkerHls.destroy();
-            resolve(true); // সচল লিংক
+            resolve(true);
           });
 
           checkerHls.on(Hls.Events.ERROR, (event, data) => {
             checkerHls.destroy();
-            resolve(false); // অচল বা ইনভ্যালিড লিংক
+            resolve(false);
           });
         });
       }
 
-      // সচল চ্যানেল সাথে সাথে UI-তে রেন্ডার করার ফাংশন
       function appendChannelToUI(channel) {
         const fallbackSVG = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjOTRhM2I4IiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHJlY3QgeD0iMiIgeT0iNyIgd2lkdGg9IjIwIiBoZWlnaHQ9IjE1IiByeD0iMiIgcnk9IjIiPjwvcmVjdD48cG9seWxpbmUgcG9pbnRzPSIxNyAyIDEyIDcgNyAyIj48L3BvbHlsaW5lPjwvc3ZnPg==";
 
@@ -460,20 +436,17 @@
 
           playChannel(channel.url);
 
-          // মোবাইল ডিভাইসে ক্লিক করলে স্ক্রিন স্মুথলি উপরে প্লেয়ারে চলে যাবে
           if (window.innerWidth < 1024) {
             window.scrollTo({ top: 0, behavior: "smooth" });
           }
         };
 
-        // যদি অলরেডি কোনো সার্চ কোয়েরি থাকে, তবে তা ফিল্টার ম্যাচ করে হাইড/শো করবে
         if (searchQuery !== "" && !channel.name.toLowerCase().includes(searchQuery)) {
           card.style.display = "none";
         }
 
         gridContainer.appendChild(card);
 
-        // প্রথম সচল চ্যানেলটি স্বয়ংক্রিয়ভাবে প্লেয়ারে লোড হবে
         if (validChannelCount === 0) {
           card.click();
         }
@@ -489,7 +462,6 @@
         });
       }
 
-      // চ্যানেল প্লেয়ার ইঞ্জিন
       function playChannel(url) {
         errorLayer.style.display = "none";
 
